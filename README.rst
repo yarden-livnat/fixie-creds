@@ -1,2 +1,3 @@
-# fixie-creds
+fixie-creds
+===========
 A Cyclus credentialing service
