@@ -9,8 +9,11 @@ import os
 import json
 import random
 import hashlib
+from collections import namedtuple
 
 from fixie.environ import expand_and_make_dir
+
+from fixie.environ import ENV
 
 
 User = namedtuple('User', ['user', 'email', 'hashed_token'])
@@ -65,7 +68,7 @@ class Cache:
             self._credsdir = expand_and_make_dir(value)
 
     def user_cred_file(self, user):
-        """Returns the credential filename for a user."""'
+        """Returns the credential filename for a user."""
         return os.path.join(self.credsdir, user + '.json')
 
     def user_exists(self, user):

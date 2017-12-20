@@ -1,4 +1,6 @@
 """Sets up the environment variables for fixie credentials."""
+import os
+
 from xonsh.tools import is_string, ensure_string, always_false
 
 from fixie.environ import ENV, ENVVARS, expand_and_make_dir
