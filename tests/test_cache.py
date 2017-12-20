@@ -25,3 +25,29 @@ def test_register(credsdir):
     msg, flag = CACHE.register(user, email)
     assert not flag
     assert msg == "User '" + user + "' already registered"
+
+
+def test_verify(credsdir):
+    user = 'saiid'
+    email = 'rukhsana@geno52.cl'
+
+    # make sure verification fails when we haven't registered
+    valid, msg, flag = CACHE.verify(user, '0' * CACHE.nbytes)
+    assert not valid
+    assert not flag
+    assert msg == "User '" + user + "' not registered"
+
+    # test a registered user with correct token
+    token, flag = CACHE.register(user, email)
+    assert flag
+    valid, msg, flag = CACHE.verify(user, token)
+    assert valid
+    assert flag
+    assert msg == 'User verified'
+
+    # test a registered user with incorrect token
+    valid, msg, flag = CACHE.verify(user, '424242')
+    assert not valid
+    assert flag
+    assert msg == 'Invalid token for user ' + user
+
