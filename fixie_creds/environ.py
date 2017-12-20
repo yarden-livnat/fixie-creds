@@ -1,7 +1,7 @@
 """Sets up the environment variables for fixie credentials."""
-from xonsh.tools import is_string, ensure_string
+from xonsh.tools import is_string, ensure_string, always_false
 
-from fixie.environ import ENV, ENVVARS
+from fixie.environ import ENV, ENVVARS, expand_and_make_dir
 
 
 def fixie_creds_dir():
@@ -12,6 +12,6 @@ def fixie_creds_dir():
 
 
 ENVVARS.update({
-    'FIXIE_CREDS_DIR': (fixie_creds_dir, is_string, str, ensure_string,
-                        'Path to fixie credentials directory'),
+    'FIXIE_CREDS_DIR': (fixie_creds_dir, always_false, expand_and_make_dir,
+                        ensure_string, 'Path to fixie credentials directory'),
 })
