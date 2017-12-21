@@ -43,7 +43,40 @@ def test_verify_valid(credsdir, http_client, base_url):
     assert exp == obs
 
 
-@pytest.mark.parametrize('name', [x[0] for x in HANDLERS[:2]])
+@pytest.mark.gen_test
+def test_deregister_valid(credsdir, http_client, base_url):
+    # register user
+    body = '{"user": "inigo", "email": "montoya@gmail.com"}'
+    url = base_url + '/register'
+    response = yield http_client.fetch(url, method="POST", body=body)
+    token = json_decode(response.body)['token']
+
+    # deregister user
+    body = json_encode({"user": "inigo", "token": token})
+    url = base_url + '/deregister'
+    response = yield http_client.fetch(url, method="POST", body=body)
+    exp = {"message": 'inigo deregistered', "status": True}
+    obs = json_decode(response.body)
+    assert exp == obs
+
+
+@pytest.mark.gen_test
+def test_reset_valid(credsdir, http_client, base_url):
+    # register user
+    body = '{"user": "inigo", "email": "montoya@gmail.com"}'
+    url = base_url + '/register'
+    response = yield http_client.fetch(url, method="POST", body=body)
+    token = json_decode(response.body)['token']
+
+    # reset user token
+    url = base_url + '/reset'
+    response = yield http_client.fetch(url, method="POST", body=body)
+    obs = json_decode(response.body)
+    assert obs['status']
+    assert token != obs['token']
+
+
+@pytest.mark.parametrize('name', [x[0] for x in HANDLERS])
 @pytest.mark.gen_test
 def test_register_invalid(credsdir, http_client, base_url, name):
     body = '{"name": 42}'
