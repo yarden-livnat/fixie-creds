@@ -20,6 +20,20 @@ class Register(RequestHandler):
         self.write(response)
 
 
+class Verify(RequestHandler):
+
+    schema = {'user': {'type': 'string', 'empty': False},
+              'token': {'type': 'string', 'regex': '[0-9a-fA-F]+'},
+              }
+    response_keys = ('verified', 'message', 'status')
+
+    def post(self):
+        resp = CACHE.verify(**self.request.arguments)
+        response = dict(zip(self.response_keys, resp))
+        self.write(response)
+
+
 HANDLERS = [
     ('/register', Register),
+    ('/verify', Verify),
 ]
