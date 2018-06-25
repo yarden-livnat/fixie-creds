@@ -61,9 +61,38 @@ class Reset(RequestHandler):
         self.write(response)
 
 
+class Login(RequestHandler):
+    schema = {'user': {'type': 'string', 'empty': False},
+              #'pass': {'type': 'string', 'empty': False},
+              'token': {'type': 'string', 'regex': '[0-9a-fA-F]+'},
+              }
+    #response_keys = ('ok', 'message', 'status')
+
+    def post(self):
+        valid, msg, status = CACHE.verify(**self.request.arguments)
+        if valid:
+            user = self.request.arguments['user']
+            self.set_secure_cookie('user', user)
+        self.write({'\tlogin status:': valid})
+
+
+class Echo(RequestHandler):
+    schema = {'msg': {'type': 'string', 'empty': False}}
+
+    def post(self):
+        print('***echo headers:', self.request.headers)
+        user = self.get_current_user()
+        msg = self.request.arguments['msg']
+        # user = self.get_secure_cookie('user')
+        print('echo user', user)
+        self.write({'echo': msg})
+
+
 HANDLERS = [
     ('/verify', Verify),
     ('/register', Register),
     ('/deregister', Deregister),
     ('/reset', Reset),
+    ('/login', Login),
+    ('/echo', Echo)
 ]

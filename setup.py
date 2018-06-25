@@ -26,6 +26,8 @@ setup_kwargs = {
     "zip_safe": False,
     "data_files": [("", ['LICENSE', 'README.rst']),],
     }
+if HAVE_SETUPTOOLS:
+    setup_kwargs['install_requires'] = ['xonsh', 'cerberus', 'tornado', 'lazyasd', 'pytest']
 
 
 if __name__ == '__main__':

@@ -76,6 +76,32 @@ def test_reset_valid(credsdir, http_client, base_url):
     assert token != obs['token']
 
 
+@pytest.mark.gen_test
+def test_login_valid(credsdir, http_client, base_url):
+    # register user
+    body = '{"user": "inigo", "email": "montoya@gmail.com"}'
+    url = base_url + '/register'
+    response = yield http_client.fetch(url, method="POST", body=body)
+    token = json_decode(response.body)['token']
+
+    # verify user
+    login = json_encode({"user": "inigo", "toekn": token})
+    url = base_url + '/login'
+    response = yield http_client.fetch(url, method="POST", body=login)
+    obs = json_decode(response.body)
+    exp = {'verified': True, 'message': 'User verified', 'status': True}
+    assert obs['verified']
+    assert obs['message'] == 'User verified'
+    assert obs['status']
+
+    # reset user token
+    url = base_url + '/reset'
+    response = yield http_client.fetch(url, method="POST", body=body)
+    obs = json_decode(response.body)
+    assert obs['status']
+    assert token != obs['token']
+
+
 @pytest.mark.parametrize('name', [x[0] for x in HANDLERS])
 @pytest.mark.gen_test
 def test_register_invalid(credsdir, http_client, base_url, name):
