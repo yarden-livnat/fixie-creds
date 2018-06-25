@@ -1,6 +1,5 @@
 """Tornado handlers for interfacing with fixie credentials."""
-
-from fixie.request_handler import RequestHandler
+from fixie.request_handler import RequestHandler, authenticated
 
 from fixie_creds.cache import CACHE
 
@@ -73,12 +72,13 @@ class Login(RequestHandler):
         if valid:
             user = self.request.arguments['user']
             self.set_secure_cookie('user', user)
-        self.write({'\tlogin status:': valid})
+        self.write({'status': valid, 'msg': msg})
 
 
 class Echo(RequestHandler):
     schema = {'msg': {'type': 'string', 'empty': False}}
 
+    @authenticated
     def post(self):
         print('***echo headers:', self.request.headers)
         user = self.get_current_user()
