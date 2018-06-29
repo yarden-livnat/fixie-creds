@@ -1,5 +1,7 @@
 """Tornado handlers for interfacing with fixie credentials."""
-from fixie.request_handler import RequestHandler, authenticated
+from base64 import b64decode
+from fixie.request_handler import RequestHandler
+import fixie_creds
 
 from fixie_creds.cache import CACHE
 
@@ -60,31 +62,30 @@ class Reset(RequestHandler):
         self.write(response)
 
 
+import re
 class Login(RequestHandler):
-    schema = {'user': {'type': 'string', 'empty': False},
-              #'pass': {'type': 'string', 'empty': False},
-              'token': {'type': 'string', 'regex': '[0-9a-fA-F]+'},
-              }
-    #response_keys = ('ok', 'message', 'status')
+    """Authorize user.
+    Must be a separate call because setting the secure cookie takes effect only on the next call"""
+    schema = {}
 
     def post(self):
-        valid, msg, status = CACHE.verify(**self.request.arguments)
-        if valid:
-            user = self.request.arguments['user']
-            self.set_secure_cookie('user', user)
+        valid, msg, status = -1, 'Unknown Authentication', False
+        if 'Authorization' in self.request.headers:
+            m = re.search('Basic (.+)', self.request.headers['Authorization'])
+            if m:
+                user, token = b64decode(m.group(1)).decode('UTF-8').split(':')
+                valid, msg, status = CACHE.verify(user, token)
+                if valid:
+                    self.set_secure_cookie('user', user)
         self.write({'status': valid, 'msg': msg})
 
 
 class Echo(RequestHandler):
     schema = {'msg': {'type': 'string', 'empty': False}}
 
-    @authenticated
+    @fixie_creds.authenticated
     def post(self):
-        print('***echo headers:', self.request.headers)
-        user = self.get_current_user()
         msg = self.request.arguments['msg']
-        # user = self.get_secure_cookie('user')
-        print('echo user', user)
         self.write({'echo': msg})
 
 

@@ -7,7 +7,7 @@ except ImportError:
     HAVE_SETUPTOOLS = False
 
 
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 
 setup_kwargs = {
     "version": VERSION,
@@ -27,7 +27,7 @@ setup_kwargs = {
     "data_files": [("", ['LICENSE', 'README.rst']),],
     }
 if HAVE_SETUPTOOLS:
-    setup_kwargs['install_requires'] = ['xonsh', 'cerberus', 'tornado', 'lazyasd', 'pytest']
+    setup_kwargs['install_requires'] = ['xonsh', 'cerberus', 'tornado', 'lazyasd', 'pytest', 'fixie']
 
 
 if __name__ == '__main__':
